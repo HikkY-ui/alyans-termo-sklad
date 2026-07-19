@@ -1,0 +1,835 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>Альянс Термо — Склад</title>
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icons/favicon-32.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="theme-color" content="#111111">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="apple-mobile-web-app-title" content="Блоки">
+<style>
+  :root {
+    --black: #111111;
+    --white: #ffffff;
+    --red: #E31E24;
+    --gray-bg: #F4F4F4;
+    --gray-border: #E0E0E0;
+    --gray-text: #8A8A8A;
+  }
+
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; user-select: none; }
+
+  html, body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    background: var(--white);
+    color: var(--black);
+    font-family: -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+    overflow: hidden;
+    touch-action: manipulation;
+  }
+
+  #app {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    height: 100dvh;
+    max-width: 480px;
+    margin: 0 auto;
+    background: var(--white);
+  }
+
+  /* ===== Header ===== */
+  header {
+    padding: 10px 18px 8px;
+    border-bottom: 2px solid var(--black);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-shrink: 0;
+  }
+
+  .brand { font-weight: 800; font-size: 14px; letter-spacing: 0.5px; }
+  .brand span { color: var(--red); }
+
+  .date-pill {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--red);
+    border: 2px solid var(--red);
+    border-radius: 20px;
+    padding: 3px 10px;
+  }
+
+  /* ===== Screens ===== */
+  main { flex: 1; min-height: 0; display: flex; flex-direction: column; }
+  .screen { display: none; flex: 1; min-height: 0; flex-direction: column; }
+  .screen.active { display: flex; }
+
+  /* ===== Screen: Добавить ===== */
+  #screenAdd { padding: 10px 16px 8px; gap: 6px; }
+
+  .section-label {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.8px;
+    color: var(--gray-text);
+    text-transform: uppercase;
+    margin: 0 0 4px 2px;
+  }
+
+  /* ===== Марка / Количество display fields ===== */
+  .field-display {
+    width: 100%;
+    border: 2px solid var(--gray-border);
+    border-radius: 12px;
+    padding: 8px;
+    font-size: 20px;
+    font-weight: 800;
+    text-align: center;
+    background: var(--gray-bg);
+    color: var(--gray-text);
+  }
+  .field-display.filled { color: var(--black); background: var(--white); border-color: var(--black); }
+  .field-display.active { border-color: var(--red); background: var(--white); color: var(--red); }
+  .field-display.filled.active { color: var(--red); }
+
+  /* ===== Material grid ===== */
+  .material-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 6px;
+  }
+  .material-btn {
+    padding: 9px 4px;
+    border: 2px solid var(--gray-border);
+    border-radius: 10px;
+    background: var(--gray-bg);
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--black);
+    text-align: center;
+  }
+  .material-btn.selected { background: var(--white); border-color: var(--red); color: var(--red); }
+
+  /* ===== Keypad (shared by Марка and Количество) ===== */
+  .keypad {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-auto-rows: min-content;
+    gap: 6px;
+    width: 100%;
+  }
+  .key {
+    border: 2px solid var(--gray-border);
+    border-radius: 12px;
+    background: var(--gray-bg);
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--black);
+    padding: 15px 0;
+    width: 100%;
+  }
+  .key.clear { color: var(--red); }
+  .key:active { background: var(--gray-border); }
+
+  /* ===== Add button ===== */
+  .add-btn {
+    width: 100%;
+    padding: 13px;
+    border: none;
+    border-radius: 12px;
+    background: var(--black);
+    color: var(--white);
+    font-size: 16px;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+    flex-shrink: 0;
+    margin-top: auto;
+  }
+  .add-btn:disabled { background: var(--gray-border); color: var(--gray-text); }
+
+  /* ===== Screen: Таблица ===== */
+  .stats-row {
+    display: flex;
+    gap: 8px;
+    padding: 8px 12px 6px;
+    flex-shrink: 0;
+  }
+  .stat-box {
+    flex: 1;
+    border: 2px solid var(--red);
+    border-radius: 10px;
+    padding: 5px 4px;
+    text-align: center;
+  }
+  .stat-box .stat-value { font-size: 16px; font-weight: 800; color: var(--black); line-height: 1.1; }
+  .stat-box .stat-label {
+    font-size: 8px;
+    font-weight: 700;
+    color: var(--gray-text);
+    text-transform: uppercase;
+    margin-top: 1px;
+    letter-spacing: 0.3px;
+  }
+
+  .table-wrap {
+    flex: 1;
+    min-height: 0;
+    overflow: hidden;
+    padding: 0 10px 8px;
+    display: flex;
+    flex-direction: column;
+  }
+  .data-table {
+    width: 100%;
+    height: 100%;
+    border-collapse: collapse;
+    border: 2px solid var(--red);
+    border-radius: 6px;
+    overflow: hidden;
+    font-size: 9px;
+    table-layout: fixed;
+  }
+  .data-table thead th {
+    background: var(--black);
+    color: var(--white);
+    padding: 3px 1px;
+    font-size: 8px;
+    font-weight: 700;
+    text-align: center;
+    border-right: 1px solid rgba(255,255,255,0.25);
+  }
+  .data-table thead th:last-child { border-right: none; }
+  .data-table tbody td {
+    padding: 1px;
+    text-align: center;
+    border-bottom: 1px solid var(--gray-border);
+    border-right: 1px solid var(--gray-border);
+    color: var(--black);
+    font-weight: 700;
+    line-height: 1.1;
+  }
+  .data-table tbody td:last-child { border-right: none; }
+  .data-table tbody td.zero { color: var(--gray-border); font-weight: 400; }
+  .data-table tbody td.marka-col { font-weight: 800; background: var(--gray-bg); }
+  .data-table tbody td.volume-col { font-weight: 800; color: var(--red); }
+  .table-status {
+    text-align: center;
+    color: var(--gray-text);
+    font-size: 12px;
+    font-weight: 600;
+    padding: 20px 0;
+  }
+
+  /* ===== Screen: История ===== */
+  .history-list {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    padding: 10px 14px 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    -webkit-overflow-scrolling: touch;
+  }
+  .history-item {
+    border: 2px solid var(--gray-border);
+    border-radius: 12px;
+    padding: 10px 12px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .hi-info { font-size: 13px; font-weight: 700; line-height: 1.5; }
+  .hi-info .hi-marka { color: var(--black); }
+  .hi-info .hi-material { color: var(--gray-text); font-weight: 600; }
+  .hi-info .hi-qty { color: var(--red); }
+  .history-actions { display: flex; gap: 8px; flex-shrink: 0; }
+  .icon-btn {
+    width: 34px;
+    height: 34px;
+    border-radius: 9px;
+    border: 2px solid var(--gray-border);
+    background: var(--gray-bg);
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .icon-btn.delete { color: var(--red); border-color: var(--red); }
+
+  /* ===== Edit modal ===== */
+  .overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(17,17,17,0.5);
+    display: none;
+    align-items: flex-end;
+    justify-content: center;
+    z-index: 30;
+  }
+  .overlay.open { display: flex; }
+  .edit-sheet {
+    width: 100%;
+    max-width: 480px;
+    background: var(--white);
+    border-radius: 20px 20px 0 0;
+    padding: 18px 16px 20px;
+    max-height: 88vh;
+    overflow-y: auto;
+  }
+  .edit-sheet-title { font-weight: 800; font-size: 15px; margin-bottom: 12px; text-align: center; }
+  .edit-btn-row { display: flex; flex-direction: column; gap: 10px; margin-top: 14px; }
+  .edit-btn-row .add-btn { margin-top: 0; }
+  .cancel-btn { background: var(--gray-bg) !important; color: var(--black) !important; }
+
+  /* ===== Bottom nav ===== */
+  nav { flex-shrink: 0; display: flex; border-top: 2px solid var(--black); }
+  nav button {
+    flex: 1;
+    border: none;
+    background: var(--white);
+    padding: 8px 0 8px;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--gray-text);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+  }
+  nav button .dot { width: 6px; height: 6px; border-radius: 50%; background: transparent; }
+  nav button.active { color: var(--red); }
+  nav button.active .dot { background: var(--red); }
+
+  .toast {
+    position: fixed;
+    bottom: 80px;
+    left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    background: var(--black);
+    color: var(--white);
+    padding: 10px 18px;
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 600;
+    opacity: 0;
+    transition: all 0.25s ease;
+    pointer-events: none;
+    z-index: 20;
+  }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+</style>
+</head>
+<body>
+<div id="app">
+
+  <header>
+    <div class="brand">АЛЬЯНС <span>ТЕРМО</span></div>
+    <div class="date-pill" id="dateLabel">--.--.----</div>
+  </header>
+
+  <main>
+    <!-- ===== Screen: Добавить ===== -->
+    <div class="screen active" id="screenAdd">
+      <div>
+        <div class="section-label">Марка</div>
+        <div class="field-display" id="markaDisplay" data-field="marka">7-40</div>
+      </div>
+
+      <div>
+        <div class="section-label">Сырьё</div>
+        <div class="material-grid" id="materialGrid"></div>
+      </div>
+
+      <div>
+        <div class="section-label">Количество</div>
+        <div class="field-display" id="qtyDisplay" data-field="qty">0</div>
+      </div>
+
+      <div style="margin-top: 20px;">
+        <div class="keypad" id="keypad"></div>
+      </div>
+
+      <button class="add-btn" id="addBtn" disabled>ДОБАВИТЬ</button>
+    </div>
+
+    <!-- ===== Screen: Таблица ===== -->
+    <div class="screen" id="screenTable">
+      <div class="stats-row">
+        <div class="stat-box">
+          <div class="stat-value" id="blocksInShopVal">—</div>
+          <div class="stat-label">Блоков в цеху</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-value" id="freeSlotsVal">—</div>
+          <div class="stat-label">Свободных мест</div>
+        </div>
+      </div>
+      <div class="table-wrap" id="tableWrap">
+        <div class="table-status" id="tableStatus">Загрузка...</div>
+      </div>
+    </div>
+
+    <!-- ===== Screen: История ===== -->
+    <div class="screen" id="screenHistory">
+      <div class="history-list" id="historyList">
+        <div class="table-status">Загрузка...</div>
+      </div>
+    </div>
+  </main>
+
+  <nav>
+    <button class="active" id="navAdd" data-screen="screenAdd"><div class="dot"></div>Добавить</button>
+    <button id="navTable" data-screen="screenTable"><div class="dot"></div>Таблица</button>
+    <button id="navHistory" data-screen="screenHistory"><div class="dot"></div>История</button>
+  </nav>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<div class="overlay" id="editOverlay">
+  <div class="edit-sheet">
+    <div class="edit-sheet-title">Редактировать запись</div>
+
+    <div class="section-label">Марка</div>
+    <div class="field-display" id="editMarkaDisplay" data-field="marka">7-40</div>
+
+    <div class="section-label" style="margin-top:10px;">Сырьё</div>
+    <div class="material-grid" id="editMaterialGrid"></div>
+
+    <div class="section-label" style="margin-top:10px;">Количество</div>
+    <div class="field-display" id="editQtyDisplay" data-field="qty">0</div>
+
+    <div style="margin-top:14px;">
+      <div class="keypad" id="editKeypad"></div>
+    </div>
+
+    <div class="edit-btn-row">
+      <button class="add-btn cancel-btn" id="editCancelBtn">Отмена</button>
+      <button class="add-btn" id="editSaveBtn">Сохранить</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  // ==================== CONFIG ====================
+  const API_URL = "https://script.google.com/macros/s/AKfycbwaJVr6TgQEEUeYsMdgyxc3KxLMK7g2JsXgI_XCrYaYdEdC_JpQRV0YJtUkFcja_74lSA/exec";
+  const MARKS_MIN = 7;
+  const MARKS_MAX = 40;
+  const MATERIALS = ["201", "301", "401", "БД", "Микс", "Рез"];
+  const MATERIAL_LABELS = { "201": "201", "301": "301", "401": "401", "БД": "Б/Д", "Микс": "Микс", "Рез": "Рез" };
+
+  // ==================== STATE ====================
+  let markaStr = "";
+  let qtyStr = "";
+  let selectedMaterial = null;
+  let activeField = "marka"; // "marka" | "qty"
+  let tablePollTimer = null;
+  let historyPollTimer = null;
+
+  // ==================== DATE ====================
+  function formatDate(d) {
+    const dd = String(d.getDate()).padStart(2, "0");
+    const mm = String(d.getMonth() + 1).padStart(2, "0");
+    const yyyy = d.getFullYear();
+    return `${dd}.${mm}.${yyyy}`;
+  }
+  document.getElementById("dateLabel").textContent = formatDate(new Date());
+
+  // ==================== SCREEN SWITCHING ====================
+  const navButtons = document.querySelectorAll("nav button");
+  navButtons.forEach(btn => {
+    btn.onclick = () => switchScreen(btn.dataset.screen);
+  });
+
+  function switchScreen(screenId) {
+    document.querySelectorAll(".screen").forEach(s => s.classList.toggle("active", s.id === screenId));
+    navButtons.forEach(b => b.classList.toggle("active", b.dataset.screen === screenId));
+
+    if (tablePollTimer) { clearInterval(tablePollTimer); tablePollTimer = null; }
+    if (historyPollTimer) { clearInterval(historyPollTimer); historyPollTimer = null; }
+
+    if (screenId === "screenTable") {
+      loadTableData();
+      tablePollTimer = setInterval(loadTableData, 5000);
+    }
+    if (screenId === "screenHistory") {
+      loadHistoryData();
+      historyPollTimer = setInterval(loadHistoryData, 5000);
+    }
+  }
+
+  // ==================== FIELD SWITCHING ====================
+  const markaDisplay = document.getElementById("markaDisplay");
+  const qtyDisplay = document.getElementById("qtyDisplay");
+
+  function setActiveField(field) {
+    activeField = field;
+    markaDisplay.classList.toggle("active", field === "marka");
+    qtyDisplay.classList.toggle("active", field === "qty");
+  }
+  markaDisplay.onclick = () => setActiveField("marka");
+  qtyDisplay.onclick = () => setActiveField("qty");
+  setActiveField("marka");
+
+  function renderFields() {
+    markaDisplay.textContent = markaStr === "" ? "7-40" : markaStr;
+    markaDisplay.classList.toggle("filled", markaStr !== "");
+    qtyDisplay.textContent = qtyStr === "" ? "0" : qtyStr;
+    qtyDisplay.classList.toggle("filled", qtyStr !== "");
+  }
+
+  // ==================== MATERIAL GRID ====================
+  const materialGrid = document.getElementById("materialGrid");
+  MATERIALS.forEach(mat => {
+    const btn = document.createElement("button");
+    btn.className = "material-btn";
+    btn.textContent = MATERIAL_LABELS[mat];
+    btn.onclick = () => {
+      selectedMaterial = mat;
+      document.querySelectorAll(".material-btn").forEach(b => b.classList.remove("selected"));
+      btn.classList.add("selected");
+      updateAddBtnState();
+    };
+    materialGrid.appendChild(btn);
+  });
+
+  // ==================== SHARED KEYPAD ====================
+  const keypad = document.getElementById("keypad");
+  const keys = ["1","2","3","4","5","6","7","8","9","C","0","⌫"];
+  keys.forEach(k => {
+    const btn = document.createElement("button");
+    btn.className = "key" + (k === "C" ? " clear" : "");
+    btn.textContent = k;
+    btn.onclick = () => handleKey(k);
+    keypad.appendChild(btn);
+  });
+
+  function handleKey(k) {
+    const isMarka = activeField === "marka";
+    let val = isMarka ? markaStr : qtyStr;
+
+    if (k === "C") {
+      val = "";
+    } else if (k === "⌫") {
+      val = val.slice(0, -1);
+    } else {
+      const maxLen = isMarka ? 2 : 4;
+      if (val.length < maxLen) val += k;
+    }
+
+    if (isMarka) markaStr = val; else qtyStr = val;
+    renderFields();
+    updateAddBtnState();
+  }
+
+  function markaValid() {
+    const n = Number(markaStr);
+    return markaStr !== "" && n >= MARKS_MIN && n <= MARKS_MAX;
+  }
+
+  function updateAddBtnState() {
+    const ready = markaValid() && selectedMaterial !== null && qtyStr !== "" && Number(qtyStr) > 0;
+    document.getElementById("addBtn").disabled = !ready;
+  }
+
+  // ==================== ADD ENTRY ====================
+  document.getElementById("addBtn").onclick = async () => {
+    const btn = document.getElementById("addBtn");
+    if (!markaValid()) {
+      showToast("Марка должна быть от 7 до 40");
+      return;
+    }
+    btn.disabled = true;
+    btn.textContent = "Добавляем...";
+    try {
+      const res = await fetch(API_URL, {
+        method: "POST",
+        headers: { "Content-Type": "text/plain;charset=utf-8" },
+        body: JSON.stringify({
+          action: "add",
+          marka: Number(markaStr),
+          material: selectedMaterial,
+          qty: Number(qtyStr)
+        })
+      });
+      const data = await res.json();
+      if (data.success) {
+        showToast(`Марка ${markaStr}, ${MATERIAL_LABELS[selectedMaterial]}: +${qtyStr}`);
+        resetForm();
+      } else {
+        showToast("Ошибка: не удалось добавить");
+      }
+    } catch (err) {
+      showToast("Ошибка сети");
+    }
+    btn.textContent = "ДОБАВИТЬ";
+    updateAddBtnState();
+  };
+
+  function resetForm() {
+    markaStr = "";
+    qtyStr = "";
+    selectedMaterial = null;
+    document.querySelectorAll(".material-btn").forEach(b => b.classList.remove("selected"));
+    renderFields();
+    setActiveField("marka");
+    updateAddBtnState();
+  }
+
+  function showToast(msg) {
+    const t = document.getElementById("toast");
+    t.textContent = msg;
+    t.classList.add("show");
+    setTimeout(() => t.classList.remove("show"), 1800);
+  }
+
+  // ==================== TABLE SCREEN ====================
+  async function loadTableData() {
+    const wrap = document.getElementById("tableWrap");
+    try {
+      const res = await fetch(`${API_URL}?action=getData`);
+      const data = await res.json();
+      renderTable(data);
+    } catch (err) {
+      wrap.innerHTML = '<div class="table-status">Не удалось загрузить данные</div>';
+    }
+  }
+
+  function renderTable(data) {
+    document.getElementById("blocksInShopVal").textContent = data.blocksInShop ?? 0;
+    document.getElementById("freeSlotsVal").textContent = data.freeSlots ?? 198;
+
+    const wrap = document.getElementById("tableWrap");
+    let html = '<table class="data-table"><thead><tr>';
+    html += '<th>Марка</th>';
+    MATERIALS.forEach(mat => html += `<th>${MATERIAL_LABELS[mat]}</th>`);
+    html += '<th>Объём</th></tr></thead><tbody>';
+
+    data.rows.forEach(row => {
+      html += '<tr>';
+      html += `<td class="marka-col">${row.marka}</td>`;
+      MATERIALS.forEach(mat => {
+        const v = row.materials[mat] || 0;
+        html += `<td class="${v === 0 ? 'zero' : ''}">${v === 0 ? '' : v}</td>`;
+      });
+      html += `<td class="volume-col">${row.volume === 0 ? '' : Math.round(row.volume * 10) / 10}</td>`;
+      html += '</tr>';
+    });
+
+    html += '</tbody></table>';
+    wrap.innerHTML = html;
+  }
+
+  // ==================== HISTORY SCREEN ====================
+  async function loadHistoryData() {
+    const list = document.getElementById("historyList");
+    try {
+      const res = await fetch(`${API_URL}?action=getData`);
+      const data = await res.json();
+      renderHistory(data.entries || []);
+    } catch (err) {
+      list.innerHTML = '<div class="table-status">Не удалось загрузить данные</div>';
+    }
+  }
+
+  function renderHistory(entries) {
+    const list = document.getElementById("historyList");
+    if (entries.length === 0) {
+      list.innerHTML = '<div class="table-status">Записей за сегодня пока нет</div>';
+      return;
+    }
+    const sorted = [...entries].sort((a, b) => new Date(b.ts) - new Date(a.ts));
+    list.innerHTML = "";
+    sorted.forEach(entry => {
+      const item = document.createElement("div");
+      item.className = "history-item";
+      item.innerHTML = `
+        <div class="hi-info">
+          <span class="hi-marka">Марка ${entry.marka}</span> ·
+          <span class="hi-material">${MATERIAL_LABELS[entry.material] || entry.material}</span> ·
+          <span class="hi-qty">${entry.qty}</span>
+        </div>
+        <div class="history-actions">
+          <button class="icon-btn edit">✏️</button>
+          <button class="icon-btn delete">🗑</button>
+        </div>`;
+      item.querySelector(".edit").onclick = () => openEditModal(entry);
+      item.querySelector(".delete").onclick = () => deleteEntry(entry);
+      list.appendChild(item);
+    });
+  }
+
+  async function deleteEntry(entry) {
+    const ok = confirm(`Удалить запись: Марка ${entry.marka}, ${MATERIAL_LABELS[entry.material]}, ${entry.qty} блоков?`);
+    if (!ok) return;
+    try {
+      const res = await fetch(API_URL, {
+        method: "POST",
+        headers: { "Content-Type": "text/plain;charset=utf-8" },
+        body: JSON.stringify({ action: "delete", id: entry.id })
+      });
+      const data = await res.json();
+      if (data.success) {
+        showToast("Запись удалена");
+        loadHistoryData();
+      } else {
+        showToast("Не удалось удалить");
+      }
+    } catch (err) {
+      showToast("Ошибка сети");
+    }
+  }
+
+  // ==================== EDIT MODAL ====================
+  let editingId = null;
+  let editMarkaStr = "";
+  let editQtyStr = "";
+  let editSelectedMaterial = null;
+  let editActiveField = "marka";
+
+  const editMarkaDisplay = document.getElementById("editMarkaDisplay");
+  const editQtyDisplay = document.getElementById("editQtyDisplay");
+
+  function setEditActiveField(field) {
+    editActiveField = field;
+    editMarkaDisplay.classList.toggle("active", field === "marka");
+    editQtyDisplay.classList.toggle("active", field === "qty");
+  }
+  editMarkaDisplay.onclick = () => setEditActiveField("marka");
+  editQtyDisplay.onclick = () => setEditActiveField("qty");
+
+  function renderEditFields() {
+    editMarkaDisplay.textContent = editMarkaStr === "" ? "7-40" : editMarkaStr;
+    editMarkaDisplay.classList.toggle("filled", editMarkaStr !== "");
+    editQtyDisplay.textContent = editQtyStr === "" ? "0" : editQtyStr;
+    editQtyDisplay.classList.toggle("filled", editQtyStr !== "");
+  }
+
+  const editMaterialGrid = document.getElementById("editMaterialGrid");
+  MATERIALS.forEach(mat => {
+    const btn = document.createElement("button");
+    btn.className = "material-btn";
+    btn.textContent = MATERIAL_LABELS[mat];
+    btn.dataset.material = mat;
+    btn.onclick = () => {
+      editSelectedMaterial = mat;
+      editMaterialGrid.querySelectorAll(".material-btn").forEach(b => b.classList.remove("selected"));
+      btn.classList.add("selected");
+    };
+    editMaterialGrid.appendChild(btn);
+  });
+
+  const editKeypad = document.getElementById("editKeypad");
+  keys.forEach(k => {
+    const btn = document.createElement("button");
+    btn.className = "key" + (k === "C" ? " clear" : "");
+    btn.textContent = k;
+    btn.onclick = () => handleEditKey(k);
+    editKeypad.appendChild(btn);
+  });
+
+  function handleEditKey(k) {
+    const isMarka = editActiveField === "marka";
+    let val = isMarka ? editMarkaStr : editQtyStr;
+    if (k === "C") {
+      val = "";
+    } else if (k === "⌫") {
+      val = val.slice(0, -1);
+    } else {
+      const maxLen = isMarka ? 2 : 4;
+      if (val.length < maxLen) val += k;
+    }
+    if (isMarka) editMarkaStr = val; else editQtyStr = val;
+    renderEditFields();
+  }
+
+  function openEditModal(entry) {
+    editingId = entry.id;
+    editMarkaStr = String(entry.marka);
+    editQtyStr = String(entry.qty);
+    editSelectedMaterial = entry.material;
+    renderEditFields();
+    editMaterialGrid.querySelectorAll(".material-btn").forEach(b => {
+      b.classList.toggle("selected", b.dataset.material === entry.material);
+    });
+    setEditActiveField("marka");
+    document.getElementById("editOverlay").classList.add("open");
+  }
+
+  function closeEditModal() {
+    document.getElementById("editOverlay").classList.remove("open");
+    editingId = null;
+  }
+
+  document.getElementById("editCancelBtn").onclick = closeEditModal;
+  document.getElementById("editOverlay").onclick = (e) => {
+    if (e.target.id === "editOverlay") closeEditModal();
+  };
+
+  document.getElementById("editSaveBtn").onclick = async () => {
+    const n = Number(editMarkaStr);
+    if (editMarkaStr === "" || n < MARKS_MIN || n > MARKS_MAX) {
+      showToast("Марка должна быть от 7 до 40");
+      return;
+    }
+    if (!editSelectedMaterial || editQtyStr === "" || Number(editQtyStr) <= 0) {
+      showToast("Заполните сырьё и количество");
+      return;
+    }
+    const btn = document.getElementById("editSaveBtn");
+    btn.disabled = true;
+    btn.textContent = "Сохраняем...";
+    try {
+      const res = await fetch(API_URL, {
+        method: "POST",
+        headers: { "Content-Type": "text/plain;charset=utf-8" },
+        body: JSON.stringify({
+          action: "edit",
+          id: editingId,
+          marka: n,
+          material: editSelectedMaterial,
+          qty: Number(editQtyStr)
+        })
+      });
+      const data = await res.json();
+      if (data.success) {
+        showToast("Запись обновлена");
+        closeEditModal();
+        loadHistoryData();
+      } else {
+        showToast("Не удалось сохранить");
+      }
+    } catch (err) {
+      showToast("Ошибка сети");
+    }
+    btn.disabled = false;
+    btn.textContent = "Сохранить";
+  };
+
+  // ==================== DISABLE PINCH / DOUBLE-TAP ZOOM ====================
+  document.addEventListener("gesturestart", e => e.preventDefault());
+  document.addEventListener("gesturechange", e => e.preventDefault());
+  document.addEventListener("gestureend", e => e.preventDefault());
+
+  let lastTouchEnd = 0;
+  document.addEventListener("touchend", e => {
+    const now = Date.now();
+    if (now - lastTouchEnd <= 300) e.preventDefault();
+    lastTouchEnd = now;
+  }, { passive: false });  // ==================== SERVICE WORKER (PWA installability) ====================
+  if ("serviceWorker" in navigator) {
+    window.addEventListener("load", () => {
+      navigator.serviceWorker.register("service-worker.js").catch(() => {});
+    });
+  }
+</script>
+</body>
+</html>
