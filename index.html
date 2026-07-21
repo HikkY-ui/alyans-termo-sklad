@@ -46,7 +46,7 @@
 
   /* ===== Header ===== */
   header {
-    padding: 10px 18px 8px;
+    padding: 6px 16px 5px;
     border-bottom: 2px solid var(--black);
     display: flex;
     align-items: center;
@@ -54,16 +54,16 @@
     flex-shrink: 0;
   }
 
-  .brand { font-weight: 800; font-size: 14px; letter-spacing: 0.5px; }
+  .brand { font-weight: 800; font-size: 13px; letter-spacing: 0.5px; }
   .brand span { color: var(--red); }
 
   .date-pill {
-    font-size: 12px;
+    font-size: 11px;
     font-weight: 700;
     color: var(--red);
     border: 2px solid var(--red);
     border-radius: 20px;
-    padding: 3px 10px;
+    padding: 2px 9px;
   }
 
   /* ===== Screens ===== */
@@ -141,66 +141,66 @@
   /* ===== Add button ===== */
   .add-btn {
     width: 100%;
-    padding: 13px;
+    padding: 22px;
     border: none;
-    border-radius: 12px;
+    border-radius: 14px;
     background: var(--black);
     color: var(--white);
-    font-size: 16px;
+    font-size: 22px;
     font-weight: 800;
     letter-spacing: 0.5px;
     flex-shrink: 0;
-    margin-top: auto;
+    margin-top: 10px;
   }
   .add-btn:disabled { background: var(--gray-border); color: var(--gray-text); }
 
   /* ===== Screen: Таблица ===== */
   .stats-row {
     display: flex;
-    gap: 8px;
-    padding: 8px 12px 6px;
+    gap: 6px;
+    padding: 5px 10px 4px;
     flex-shrink: 0;
   }
   .stat-box {
     flex: 1;
     border: 2px solid var(--red);
-    border-radius: 10px;
-    padding: 5px 4px;
+    border-radius: 8px;
+    padding: 3px 4px;
     text-align: center;
   }
-  .stat-box .stat-value { font-size: 16px; font-weight: 800; color: var(--black); line-height: 1.1; }
+  .stat-box .stat-value { font-size: 13px; font-weight: 800; color: var(--black); line-height: 1.1; }
   .stat-box .stat-label {
-    font-size: 8px;
+    font-size: 7px;
     font-weight: 700;
     color: var(--gray-text);
     text-transform: uppercase;
-    margin-top: 1px;
-    letter-spacing: 0.3px;
+    margin-top: 0;
+    letter-spacing: 0.2px;
   }
 
   .table-wrap {
     flex: 1;
     min-height: 0;
     overflow: hidden;
-    padding: 0 10px 8px;
+    padding: 0 8px 8px;
     display: flex;
     flex-direction: column;
   }
   .data-table {
     width: 100%;
-    height: 100%;
     border-collapse: collapse;
     border: 2px solid var(--red);
     border-radius: 6px;
     overflow: hidden;
-    font-size: 9px;
+    font-size: var(--tfs, 13px);
     table-layout: fixed;
   }
+  .data-table.stretch { height: 100%; }
   .data-table thead th {
     background: var(--black);
     color: var(--white);
     padding: 3px 1px;
-    font-size: 8px;
+    font-size: calc(var(--tfs, 13px) * 0.78);
     font-weight: 700;
     text-align: center;
     border-right: 1px solid rgba(255,255,255,0.25);
@@ -212,7 +212,7 @@
     border-bottom: 1px solid var(--gray-border);
     border-right: 1px solid var(--gray-border);
     color: var(--black);
-    font-weight: 700;
+    font-weight: 800;
     line-height: 1.1;
   }
   .data-table tbody td:last-child { border-right: none; }
@@ -295,16 +295,16 @@
     flex: 1;
     border: none;
     background: var(--white);
-    padding: 8px 0 8px;
-    font-size: 11px;
+    padding: 17px 0 16px;
+    font-size: 16px;
     font-weight: 700;
     color: var(--gray-text);
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 3px;
+    gap: 6px;
   }
-  nav button .dot { width: 6px; height: 6px; border-radius: 50%; background: transparent; }
+  nav button .dot { width: 8px; height: 8px; border-radius: 50%; background: transparent; }
   nav button.active { color: var(--red); }
   nav button.active .dot { background: var(--red); }
 
@@ -331,7 +331,7 @@
 <div id="app">
 
   <header>
-    <div class="brand">АЛЬЯНС <span>ТЕРМО</span></div>
+    <div class="brand">А<span>Т</span></div>
     <div class="date-pill" id="dateLabel">--.--.----</div>
   </header>
 
@@ -433,6 +433,7 @@
   let activeField = "marka"; // "marka" | "qty"
   let tablePollTimer = null;
   let historyPollTimer = null;
+  let lastData = null; // cache of the last successful getTodayData() response
 
   // ==================== DATE ====================
   function formatDate(d) {
@@ -442,6 +443,7 @@
     return `${dd}.${mm}.${yyyy}`;
   }
   document.getElementById("dateLabel").textContent = formatDate(new Date());
+  loadTableData(); // warm the cache in the background so Таблица/История feel instant on first open
 
   // ==================== SCREEN SWITCHING ====================
   const navButtons = document.querySelectorAll("nav button");
@@ -457,10 +459,13 @@
     if (historyPollTimer) { clearInterval(historyPollTimer); historyPollTimer = null; }
 
     if (screenId === "screenTable") {
+      if (lastData) renderTable(lastData);
+      requestAnimationFrame(fitTableFont);
       loadTableData();
       tablePollTimer = setInterval(loadTableData, 5000);
     }
     if (screenId === "screenHistory") {
+      if (lastData) renderHistory(lastData.entries || []);
       loadHistoryData();
       historyPollTimer = setInterval(loadHistoryData, 5000);
     }
@@ -496,6 +501,7 @@
       selectedMaterial = mat;
       document.querySelectorAll(".material-btn").forEach(b => b.classList.remove("selected"));
       btn.classList.add("selected");
+      setActiveField("qty");
       updateAddBtnState();
     };
     materialGrid.appendChild(btn);
@@ -541,37 +547,23 @@
   }
 
   // ==================== ADD ENTRY ====================
-  document.getElementById("addBtn").onclick = async () => {
-    const btn = document.getElementById("addBtn");
+  document.getElementById("addBtn").onclick = () => {
     if (!markaValid()) {
       showToast("Марка должна быть от 7 до 40");
       return;
     }
-    btn.disabled = true;
-    btn.textContent = "Добавляем...";
-    try {
-      const res = await fetch(API_URL, {
-        method: "POST",
-        headers: { "Content-Type": "text/plain;charset=utf-8" },
-        body: JSON.stringify({
-          action: "add",
-          marka: Number(markaStr),
-          material: selectedMaterial,
-          qty: Number(qtyStr)
-        })
-      });
-      const data = await res.json();
-      if (data.success) {
-        showToast(`Марка ${markaStr}, ${MATERIAL_LABELS[selectedMaterial]}: +${qtyStr}`);
-        resetForm();
-      } else {
-        showToast("Ошибка: не удалось добавить");
-      }
-    } catch (err) {
-      showToast("Ошибка сети");
-    }
-    btn.textContent = "ДОБАВИТЬ";
-    updateAddBtnState();
+    const markaVal = markaStr, qtyVal = qtyStr, materialVal = selectedMaterial;
+    showToast(`Марка ${markaVal}, ${MATERIAL_LABELS[materialVal]}: +${qtyVal}`);
+    resetForm();
+    fetch(API_URL, {
+      method: "POST",
+      headers: { "Content-Type": "text/plain;charset=utf-8" },
+      body: JSON.stringify({ action: "add", marka: Number(markaVal), material: materialVal, qty: Number(qtyVal) })
+    }).then(res => res.json()).then(data => {
+      if (!data.success) showToast("Не сохранилось на сервере — попробуйте снова");
+    }).catch(() => {
+      showToast("Ошибка сети — запись не сохранена");
+    });
   };
 
   function resetForm() {
@@ -597,9 +589,10 @@
     try {
       const res = await fetch(`${API_URL}?action=getData`);
       const data = await res.json();
+      lastData = data;
       renderTable(data);
     } catch (err) {
-      wrap.innerHTML = '<div class="table-status">Не удалось загрузить данные</div>';
+      if (!lastData) wrap.innerHTML = '<div class="table-status">Не удалось загрузить данные</div>';
     }
   }
 
@@ -626,6 +619,35 @@
 
     html += '</tbody></table>';
     wrap.innerHTML = html;
+    fitTableFont();
+  }
+
+  // Finds the largest font size (in px) at which the whole 34-row table still
+  // fits inside its container without needing to scroll — then stretches rows
+  // evenly to fill any leftover space at that size.
+  function fitTableFont() {
+    const wrap = document.getElementById("tableWrap");
+    const table = wrap.querySelector(".data-table");
+    if (!table || wrap.clientHeight === 0) return;
+
+    table.classList.remove("stretch");
+    let fs = 22;
+    const minFs = 7;
+    table.style.setProperty("--tfs", fs + "px");
+
+    // shrink until it fits
+    while (fs > minFs && table.scrollHeight > wrap.clientHeight) {
+      fs -= 0.5;
+      table.style.setProperty("--tfs", fs + "px");
+    }
+    // grow back a little in case we started too big to ever fit at max
+    while (fs < 22 && table.scrollHeight <= wrap.clientHeight) {
+      fs += 0.5;
+      table.style.setProperty("--tfs", fs + "px");
+      if (table.scrollHeight > wrap.clientHeight) { fs -= 0.5; table.style.setProperty("--tfs", fs + "px"); break; }
+    }
+
+    table.classList.add("stretch"); // fill remaining space evenly across rows
   }
 
   // ==================== HISTORY SCREEN ====================
@@ -634,9 +656,10 @@
     try {
       const res = await fetch(`${API_URL}?action=getData`);
       const data = await res.json();
+      lastData = data;
       renderHistory(data.entries || []);
     } catch (err) {
-      list.innerHTML = '<div class="table-status">Не удалось загрузить данные</div>';
+      if (!lastData) list.innerHTML = '<div class="table-status">Не удалось загрузить данные</div>';
     }
   }
 
