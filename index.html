@@ -141,16 +141,16 @@
   /* ===== Add button ===== */
   .add-btn {
     width: 100%;
-    padding: 22px;
+    padding: 14px;
     border: none;
-    border-radius: 14px;
+    border-radius: 12px;
     background: var(--black);
     color: var(--white);
-    font-size: 22px;
+    font-size: 17px;
     font-weight: 800;
     letter-spacing: 0.5px;
     flex-shrink: 0;
-    margin-top: 10px;
+    margin-top: 6px;
   }
   .add-btn:disabled { background: var(--gray-border); color: var(--gray-text); }
 
@@ -188,19 +188,19 @@
   }
   .data-table {
     width: 100%;
+    height: 100%;
     border-collapse: collapse;
     border: 2px solid var(--red);
     border-radius: 6px;
     overflow: hidden;
-    font-size: var(--tfs, 13px);
+    font-size: 15px;
     table-layout: fixed;
   }
-  .data-table.stretch { height: 100%; }
   .data-table thead th {
     background: var(--black);
     color: var(--white);
     padding: 3px 1px;
-    font-size: calc(var(--tfs, 13px) * 0.78);
+    font-size: 11px;
     font-weight: 700;
     text-align: center;
     border-right: 1px solid rgba(255,255,255,0.25);
@@ -295,16 +295,16 @@
     flex: 1;
     border: none;
     background: var(--white);
-    padding: 17px 0 16px;
-    font-size: 16px;
+    padding: 9px 0 8px;
+    font-size: 12px;
     font-weight: 700;
     color: var(--gray-text);
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 6px;
+    gap: 3px;
   }
-  nav button .dot { width: 8px; height: 8px; border-radius: 50%; background: transparent; }
+  nav button .dot { width: 6px; height: 6px; border-radius: 50%; background: transparent; }
   nav button.active { color: var(--red); }
   nav button.active .dot { background: var(--red); }
 
@@ -460,7 +460,6 @@
 
     if (screenId === "screenTable") {
       if (lastData) renderTable(lastData);
-      requestAnimationFrame(fitTableFont);
       loadTableData();
       tablePollTimer = setInterval(loadTableData, 5000);
     }
@@ -619,35 +618,6 @@
 
     html += '</tbody></table>';
     wrap.innerHTML = html;
-    fitTableFont();
-  }
-
-  // Finds the largest font size (in px) at which the whole 34-row table still
-  // fits inside its container without needing to scroll — then stretches rows
-  // evenly to fill any leftover space at that size.
-  function fitTableFont() {
-    const wrap = document.getElementById("tableWrap");
-    const table = wrap.querySelector(".data-table");
-    if (!table || wrap.clientHeight === 0) return;
-
-    table.classList.remove("stretch");
-    let fs = 22;
-    const minFs = 7;
-    table.style.setProperty("--tfs", fs + "px");
-
-    // shrink until it fits
-    while (fs > minFs && table.scrollHeight > wrap.clientHeight) {
-      fs -= 0.5;
-      table.style.setProperty("--tfs", fs + "px");
-    }
-    // grow back a little in case we started too big to ever fit at max
-    while (fs < 22 && table.scrollHeight <= wrap.clientHeight) {
-      fs += 0.5;
-      table.style.setProperty("--tfs", fs + "px");
-      if (table.scrollHeight > wrap.clientHeight) { fs -= 0.5; table.style.setProperty("--tfs", fs + "px"); break; }
-    }
-
-    table.classList.add("stretch"); // fill remaining space evenly across rows
   }
 
   // ==================== HISTORY SCREEN ====================
