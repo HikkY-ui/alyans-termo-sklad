@@ -154,6 +154,15 @@
   }
   .add-btn:disabled { background: var(--gray-border); color: var(--gray-text); }
 
+  .clear-btn {
+    background: var(--white);
+    color: var(--red);
+    border: 2px solid var(--red);
+    padding: 10px;
+    font-size: 13px;
+    margin-top: 6px;
+  }
+
   /* ===== Screen: Таблица ===== */
   .stats-row {
     display: flex;
@@ -358,6 +367,7 @@
       </div>
 
       <button class="add-btn" id="addBtn" disabled>ДОБАВИТЬ</button>
+      <button class="add-btn clear-btn" id="clearAllBtn">ОЧИСТИТЬ ТАБЛИЦУ</button>
     </div>
 
     <!-- ===== Screen: Таблица ===== -->
@@ -444,6 +454,29 @@
   }
   document.getElementById("dateLabel").textContent = formatDate(new Date());
   loadTableData(); // warm the cache in the background so Таблица/История feel instant on first open
+
+  // ==================== CLEAR TABLE ====================
+  document.getElementById("clearAllBtn").onclick = async () => {
+    const ok = confirm("Точно очистить всю таблицу за сегодня? Это действие нельзя отменить.");
+    if (!ok) return;
+    try {
+      const res = await fetch(API_URL, {
+        method: "POST",
+        headers: { "Content-Type": "text/plain;charset=utf-8" },
+        body: JSON.stringify({ action: "clearAll" })
+      });
+      const data = await res.json();
+      if (data.success) {
+        showToast("Таблица очищена");
+        lastData = null;
+        loadTableData();
+      } else {
+        showToast("Не удалось очистить");
+      }
+    } catch (err) {
+      showToast("Ошибка сети");
+    }
+  };
 
   // ==================== SCREEN SWITCHING ====================
   const navButtons = document.querySelectorAll("nav button");
