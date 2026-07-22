@@ -3,14 +3,14 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no, viewport-fit=cover">
-<title>Альянс Термо — ППС</title>
+<title>Альянс Термо — Склад</title>
 <link rel="manifest" href="manifest.json">
 <link rel="icon" href="favicon-32.png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <meta name="theme-color" content="#111111">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black">
-<meta name="apple-mobile-web-app-title" content="ППС">
+<meta name="apple-mobile-web-app-title" content="Блоки">
 <style>
   :root {
     --black: #111111;
@@ -44,97 +44,52 @@
     background: var(--white);
   }
 
+  /* ===== Header ===== */
   header {
-    padding: 3px 14px 3px;
+    padding: 6px 16px 5px;
     border-bottom: 2px solid var(--black);
     display: flex;
     align-items: center;
     justify-content: space-between;
     flex-shrink: 0;
   }
-  .brand { font-weight: 800; font-size: 11px; letter-spacing: 0.5px; flex-shrink: 0; }
+
+  .brand { font-weight: 800; font-size: 13px; letter-spacing: 0.5px; }
   .brand span { color: var(--red); }
-  .table-label {
-    font-size: 12px;
-    font-weight: 800;
-    color: var(--black);
-    text-align: center;
-    flex: 1;
-  }
+
   .date-pill {
-    font-size: 10px;
+    font-size: 11px;
     font-weight: 700;
     color: var(--red);
     border: 2px solid var(--red);
     border-radius: 20px;
-    padding: 1px 8px;
-    flex-shrink: 0;
+    padding: 2px 9px;
   }
 
+  /* ===== Screens ===== */
   main { flex: 1; min-height: 0; display: flex; flex-direction: column; }
   .screen { display: none; flex: 1; min-height: 0; flex-direction: column; }
   .screen.active { display: flex; }
 
-  #screenAdd { padding: 6px 10px 6px; gap: 5px; }
+  /* ===== Screen: Добавить ===== */
+  #screenAdd { padding: 5px 16px 5px; gap: 3px; }
 
-  /* ===== Grid table ===== */
-  .grid-wrap { flex: 1; min-height: 0; display: flex; flex-direction: column; }
-  .data-table {
-    width: 100%;
-    height: 100%;
-    border-collapse: collapse;
-    border: 2px solid var(--red);
-    border-radius: 6px;
-    overflow: hidden;
-    font-size: 17px;
-    table-layout: fixed;
-  }
-  .data-table thead th {
-    background: var(--black);
-    color: var(--white);
-    padding: 6px 1px;
-    font-size: 13px;
-    font-weight: 700;
-    text-align: center;
-    border-right: 1px solid rgba(255,255,255,0.25);
-  }
-  .data-table thead th:last-child { border-right: none; }
-  .data-table tbody th {
-    background: var(--gray-bg);
-    color: var(--black);
-    padding: 6px 3px;
-    font-size: 13px;
-    font-weight: 800;
-    text-align: left;
-    border-right: 1px solid var(--gray-border);
-    border-bottom: 1px solid var(--gray-border);
-  }
-  .data-table tbody td {
-    padding: 2px;
-    text-align: center;
-    border-bottom: 1px solid var(--gray-border);
-    border-right: 1px solid var(--gray-border);
-    color: var(--black);
-    font-weight: 700;
-  }
-  .data-table tbody td:last-child { border-right: none; }
-  .data-table tbody td.selected { background: var(--red); color: var(--white); font-weight: 800; }
-
-  /* ===== Количество field ===== */
   .section-label {
     font-size: 10px;
     font-weight: 700;
     letter-spacing: 0.8px;
     color: var(--gray-text);
     text-transform: uppercase;
-    margin: 0 0 3px 2px;
+    margin: 0 0 4px 2px;
   }
+
+  /* ===== Марка / Количество display fields ===== */
   .field-display {
     width: 100%;
     border: 2px solid var(--gray-border);
     border-radius: 12px;
-    padding: 6px;
-    font-size: 18px;
+    padding: 5px;
+    font-size: 17px;
     font-weight: 800;
     text-align: center;
     background: var(--gray-bg);
@@ -144,90 +99,174 @@
   .field-display.active { border-color: var(--red); background: var(--white); color: var(--red); }
   .field-display.filled.active { color: var(--red); }
 
-  /* ===== Keypad (9 digits + Добавить/0/⌫ row) ===== */
+  /* ===== Material grid ===== */
+  .material-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 6px;
+  }
+  .material-btn {
+    padding: 6px 4px;
+    border: 2px solid var(--gray-border);
+    border-radius: 10px;
+    background: var(--gray-bg);
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--black);
+    text-align: center;
+  }
+  .material-btn.selected { background: var(--white); border-color: var(--red); color: var(--red); }
+
+  /* ===== Keypad (shared by Марка and Количество) ===== */
   .keypad {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     grid-auto-rows: min-content;
-    gap: 5px;
+    gap: 6px;
     width: 100%;
   }
   .key {
     border: 2px solid var(--gray-border);
-    border-radius: 11px;
+    border-radius: 12px;
     background: var(--gray-bg);
-    font-size: 16px;
+    font-size: 20px;
     font-weight: 700;
     color: var(--black);
-    padding: 10px 0;
+    padding: 18px 0;
     width: 100%;
   }
+  .key.clear { color: var(--red); }
   .key:active { background: var(--gray-border); }
-  .key.add-key {
-    background: #1FA24A;
-    color: var(--white);
-    border-color: #1FA24A;
-    font-size: 22px;
-  }
-  .key.add-key:disabled { background: var(--gray-border); color: var(--gray-text); border-color: var(--gray-border); }
 
-  .btn-row { display: flex; gap: 8px; }
-  .action-btn {
-    flex: 1;
-    padding: 12px;
+  /* ===== Add button ===== */
+  .add-btn {
+    width: 100%;
+    padding: 26px;
     border: none;
-    border-radius: 12px;
+    border-radius: 14px;
+    background: var(--black);
+    color: var(--white);
+    font-size: 21px;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+    flex-shrink: 0;
+    margin-top: 8px;
+  }
+  .add-btn:disabled { background: var(--gray-border); color: var(--gray-text); }
+
+  .secondary-btn-row { display: flex; gap: 8px; margin-top: 6px; }
+  .clear-btn {
     background: var(--white);
     color: var(--red);
     border: 2px solid var(--red);
-    font-size: 13px;
-    font-weight: 800;
-    letter-spacing: 0.3px;
+    padding: 10px;
+    font-size: 12px;
+    margin-top: 0;
+    flex: 1;
   }
-  .action-btn:disabled { border-color: var(--gray-border); color: var(--gray-border); }
+  .clear-btn:disabled { border-color: var(--gray-border); color: var(--gray-border); }
+  .remove-block-btn {
+    padding: 10px;
+    font-size: 12px;
+    margin-top: 0;
+    flex: 1;
+  }
 
-  /* ===== Screen: Отчёт ===== */
-  #screenReport { padding: 6px 10px 6px; gap: 4px; }
-  .report-wrap { flex: 1; min-height: 0; display: flex; flex-direction: column; gap: 4px; overflow: hidden; }
-  .report-block { flex: 1; min-height: 0; display: flex; flex-direction: column; }
-  .report-block-label {
-    font-size: 9px;
-    font-weight: 800;
-    color: var(--red);
-    margin: 0 0 1px 2px;
+  /* ===== Screen: Таблица ===== */
+  .stats-row {
+    display: flex;
+    gap: 6px;
+    padding: 5px 10px 4px;
     flex-shrink: 0;
   }
-  .report-table { width: 100%; flex: 1; min-height: 0; border-collapse: collapse; border: 1.5px solid var(--red); border-radius: 4px; overflow: hidden; font-size: 8px; table-layout: fixed; }
-  .report-table th {
-    background: var(--black);
-    color: var(--white);
-    padding: 1px;
+  .stat-box {
+    flex: 1;
+    border: 2px solid var(--red);
+    border-radius: 8px;
+    padding: 3px 4px;
+    text-align: center;
+  }
+  .stat-box .stat-value { font-size: 13px; font-weight: 800; color: var(--black); line-height: 1.1; }
+  .stat-box .stat-label {
     font-size: 7px;
     font-weight: 700;
-    text-align: center;
-    border-right: 1px solid rgba(255,255,255,0.2);
+    color: var(--gray-text);
+    text-transform: uppercase;
+    margin-top: 0;
+    letter-spacing: 0.2px;
   }
-  .report-table th:last-child { border-right: none; }
-  .report-table tbody th {
-    background: var(--gray-bg);
-    color: var(--black);
-    text-align: left;
-    padding: 1px 2px;
-    border-right: 1px solid var(--gray-border);
-    border-bottom: 1px solid var(--gray-border);
+
+  .table-wrap {
+    flex: 1;
+    min-height: 0;
+    overflow: hidden;
+    padding: 0 8px 8px;
+    display: flex;
+    flex-direction: column;
   }
-  .report-table td {
-    text-align: center;
-    color: var(--black);
+  .data-table {
+    width: 100%;
+    height: 100%;
+    border-collapse: collapse;
+    border: 2px solid var(--red);
+    border-radius: 6px;
+    overflow: hidden;
+    font-size: 14px;
+    table-layout: fixed;
+  }
+  .data-table thead th {
+    background: var(--black);
+    color: var(--white);
+    padding: 2px 1px;
+    font-size: 9px;
     font-weight: 700;
+    text-align: center;
+    border-right: 1px solid rgba(255,255,255,0.25);
+  }
+  .data-table thead th:last-child { border-right: none; }
+  .data-table tbody td {
+    padding: 0px 1px;
+    text-align: center;
     border-bottom: 1px solid var(--gray-border);
     border-right: 1px solid var(--gray-border);
+    color: var(--black);
+    font-weight: 800;
+    line-height: 1.05;
   }
-  .report-table td:last-child { border-right: none; }
+  .data-table tbody td:last-child { border-right: none; }
+  .data-table tbody td.zero { color: var(--gray-border); font-weight: 400; }
+  .data-table tbody td.marka-col { font-weight: 800; background: var(--gray-bg); }
+  .data-table tbody td.volume-col { font-weight: 800; color: var(--red); }
+  .table-status {
+    text-align: center;
+    color: var(--gray-text);
+    font-size: 12px;
+    font-weight: 600;
+    padding: 20px 0;
+  }
+
+  /* ===== Bottom nav ===== */
+  nav { flex-shrink: 0; display: flex; border-top: 2px solid var(--black); }
+  nav button {
+    flex: 1;
+    border: none;
+    background: var(--white);
+    padding: 9px 0 8px;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--gray-text);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+  }
+  nav button .dot { width: 6px; height: 6px; border-radius: 50%; background: transparent; }
+  nav button.active { color: var(--red); }
+  nav button.active .dot { background: var(--red); }
 
   .toast {
     position: fixed;
-    bottom: 24px;
+    bottom: 80px;
     left: 50%;
     transform: translateX(-50%) translateY(20px);
     background: var(--black);
@@ -249,60 +288,80 @@
 
   <header>
     <div class="brand">А<span>Т</span></div>
-    <div class="table-label" id="tableLabel">Пачки</div>
     <div class="date-pill" id="dateLabel">--.--.----</div>
   </header>
 
   <main>
-    <!-- ===== Screen: Добавить (reused for all 4 tables) ===== -->
+    <!-- ===== Screen: Добавить ===== -->
     <div class="screen active" id="screenAdd">
-      <div class="grid-wrap" id="gridWrap">
-        <div style="text-align:center;color:var(--gray-text);font-size:12px;padding:20px 0;">Загрузка...</div>
+      <div>
+        <div class="section-label">Марка</div>
+        <div class="field-display" id="markaDisplay" data-field="marka">7-40</div>
       </div>
 
       <div>
-        <div class="section-label">Значение</div>
-        <div class="field-display" id="valDisplay">0</div>
+        <div class="section-label">Сырьё</div>
+        <div class="material-grid" id="materialGrid"></div>
       </div>
 
-      <div class="keypad" id="keypad"></div>
+      <div>
+        <div class="section-label">Количество</div>
+        <div class="field-display" id="qtyDisplay" data-field="qty">0</div>
+      </div>
 
-      <div class="btn-row">
-        <button class="action-btn" id="clearAllBtn">ОЧИСТИТЬ ВСЕ</button>
-        <button class="action-btn" id="deleteBtn" disabled>УДАЛИТЬ</button>
+      <div style="margin-top: 4px;">
+        <div class="keypad" id="keypad"></div>
+      </div>
+
+      <button class="add-btn" id="addBtn" disabled>ДОБАВИТЬ</button>
+      <div class="secondary-btn-row">
+        <button class="add-btn clear-btn" id="clearAllBtn">ОЧИСТИТЬ ТАБЛИЦУ</button>
+        <button class="add-btn remove-block-btn" id="removeBlockBtn" disabled>УДАЛИТЬ БЛОК</button>
       </div>
     </div>
 
-    <!-- ===== Screen: Отчёт ===== -->
-    <div class="screen" id="screenReport">
-      <div class="report-wrap" id="reportWrap">
-        <div style="text-align:center;color:var(--gray-text);font-size:12px;padding:20px 0;">Загрузка...</div>
+    <!-- ===== Screen: Таблица ===== -->
+    <div class="screen" id="screenTable">
+      <div class="stats-row">
+        <div class="stat-box">
+          <div class="stat-value" id="blocksInShopVal">—</div>
+          <div class="stat-label">Блоков в цеху</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-value" id="freeSlotsVal">—</div>
+          <div class="stat-label">Свободных мест</div>
+        </div>
+      </div>
+      <div class="table-wrap" id="tableWrap">
+        <div class="table-status" id="tableStatus">Загрузка...</div>
       </div>
     </div>
   </main>
+
+  <nav>
+    <button class="active" id="navAdd" data-screen="screenAdd"><div class="dot"></div>Добавить</button>
+    <button id="navTable" data-screen="screenTable"><div class="dot"></div>Таблица</button>
+  </nav>
 </div>
 
 <div class="toast" id="toast"></div>
 
+
 <script>
   // ==================== CONFIG ====================
-  const API_URL = "https://script.google.com/macros/s/AKfycbxyCUYYc6XiR5M5nsoqeJn0IjmKWlJVRqZGAREsVHckGy1WPiGxwg41_qRcNipOZaaUTg/exec";
-  const TABLES = [
-    { id: "пачки", label: "Пачки" },
-    { id: "2000", label: "2000" },
-    { id: "3000", label: "3000" },
-    { id: "4000", label: "4000" }
-  ];
+  const API_URL = "https://script.google.com/macros/s/AKfycbwaJVr6TgQEEUeYsMdgyxc3KxLMK7g2JsXgI_XCrYaYdEdC_JpQRV0YJtUkFcja_74lSA/exec";
+  const MARKS_MIN = 7;
+  const MARKS_MAX = 40;
+  const MATERIALS = ["201", "301", "401", "БД", "Микс", "Рез"];
+  const MATERIAL_LABELS = { "201": "201", "301": "301", "401": "401", "БД": "Б/Д", "Микс": "Микс", "Рез": "Рез" };
 
   // ==================== STATE ====================
-  let ROWS = [];
-  let COLS = [];
-  let dataByTable = {}; // { tableId: { rowLabel: { colLabel: value } } }
-  let currentTableIndex = 0;
-  let currentView = "add"; // "add" | "report"
-  let selectedRow = null;
-  let selectedCol = null;
-  let valStr = "";
+  let markaStr = "";
+  let qtyStr = "";
+  let selectedMaterial = null;
+  let activeField = "marka"; // "marka" | "qty"
+  let tablePollTimer = null;
+  let lastData = null; // cache of the last successful getTodayData() response
 
   // ==================== DATE ====================
   function formatDate(d) {
@@ -312,198 +371,177 @@
     return `${dd}.${mm}.${yyyy}`;
   }
   document.getElementById("dateLabel").textContent = formatDate(new Date());
+  loadTableData(); // warm the cache in the background so Таблица/История feel instant on first open
 
-  // ==================== LOAD ALL DATA ====================
-  async function loadAllData() {
+  // ==================== CLEAR TABLE ====================
+  document.getElementById("clearAllBtn").onclick = async () => {
+    const ok = confirm("Точно очистить всю таблицу за сегодня? Это действие нельзя отменить.");
+    if (!ok) return;
     try {
-      const res = await fetch(`${API_URL}?action=getAllData`);
+      const res = await fetch(API_URL, {
+        method: "POST",
+        headers: { "Content-Type": "text/plain;charset=utf-8" },
+        body: JSON.stringify({ action: "clearAll" })
+      });
       const data = await res.json();
-      ROWS = data.rows;
-      COLS = data.cols;
-      dataByTable = data.tables;
-      if (currentView === "add") renderGrid();
-      else renderReport();
+      if (data.success) {
+        showToast("Таблица очищена");
+        lastData = null;
+        loadTableData();
+      } else {
+        showToast("Не удалось очистить");
+      }
     } catch (err) {
-      document.getElementById("gridWrap").innerHTML =
-        '<div style="text-align:center;color:var(--gray-text);font-size:12px;padding:20px 0;">Не удалось загрузить таблицу</div>';
+      showToast("Ошибка сети");
+    }
+  };
+
+  // ==================== SCREEN SWITCHING ====================
+  const navButtons = document.querySelectorAll("nav button");
+  navButtons.forEach(btn => {
+    btn.onclick = () => switchScreen(btn.dataset.screen);
+  });
+
+  function switchScreen(screenId) {
+    document.querySelectorAll(".screen").forEach(s => s.classList.toggle("active", s.id === screenId));
+    navButtons.forEach(b => b.classList.toggle("active", b.dataset.screen === screenId));
+
+    if (tablePollTimer) { clearInterval(tablePollTimer); tablePollTimer = null; }
+
+    if (screenId === "screenTable") {
+      if (lastData) renderTable(lastData);
+      loadTableData();
+      tablePollTimer = setInterval(loadTableData, 5000);
     }
   }
 
-  // ==================== ADD SCREEN: RENDER GRID ====================
-  function currentTable() { return TABLES[currentTableIndex]; }
+  // ==================== FIELD SWITCHING ====================
+  const markaDisplay = document.getElementById("markaDisplay");
+  const qtyDisplay = document.getElementById("qtyDisplay");
 
-  function renderGrid() {
-    const t = currentTable();
-    document.getElementById("tableLabel").textContent = t.label;
-    const values = dataByTable[t.id] || {};
+  function setActiveField(field) {
+    activeField = field;
+    markaDisplay.classList.toggle("active", field === "marka");
+    qtyDisplay.classList.toggle("active", field === "qty");
+  }
+  markaDisplay.onclick = () => setActiveField("marka");
+  qtyDisplay.onclick = () => setActiveField("qty");
+  setActiveField("marka");
 
-    let html = '<table class="data-table"><thead><tr><th></th>';
-    COLS.forEach(c => html += `<th>${c}</th>`);
-    html += '</tr></thead><tbody>';
-    ROWS.forEach(r => {
-      html += `<tr><th>${r}</th>`;
-      COLS.forEach(c => {
-        const v = (values[r] || {})[c];
-        const isSel = (r === selectedRow && c === selectedCol);
-        html += `<td class="${isSel ? 'selected' : ''}" data-row="${r}" data-col="${c}">${v === "" || v === undefined ? "" : v}</td>`;
-      });
-      html += '</tr>';
-    });
-    html += '</tbody></table>';
-    document.getElementById("gridWrap").innerHTML = html;
-
-    document.querySelectorAll(".data-table tbody td").forEach(td => {
-      td.onclick = () => selectCell(td.dataset.row, td.dataset.col);
-    });
+  function renderFields() {
+    markaDisplay.textContent = markaStr === "" ? "7-40" : markaStr;
+    markaDisplay.classList.toggle("filled", markaStr !== "");
+    qtyDisplay.textContent = qtyStr === "" ? "0" : qtyStr;
+    qtyDisplay.classList.toggle("filled", qtyStr !== "");
   }
 
-  function selectCell(row, col) {
-    selectedRow = row;
-    selectedCol = col;
-    valStr = "";
-    renderVal();
-    renderGrid();
-    updateBtnState();
-  }
-
-  function renderVal() {
-    const el = document.getElementById("valDisplay");
-    el.textContent = valStr === "" ? "0" : valStr;
-    el.classList.toggle("filled", valStr !== "");
-    el.classList.toggle("active", selectedRow !== null);
-  }
-
-  // ==================== KEYPAD ====================
-  // Layout: 1-9 as usual, bottom row is [Добавить, 0, ⌫] — no "C".
-  const keypad = document.getElementById("keypad");
-  const digitKeys = ["1","2","3","4","5","6","7","8","9"];
-  digitKeys.forEach(k => {
+  // ==================== MATERIAL GRID ====================
+  const materialGrid = document.getElementById("materialGrid");
+  MATERIALS.forEach(mat => {
     const btn = document.createElement("button");
-    btn.className = "key";
+    btn.className = "material-btn";
+    btn.textContent = MATERIAL_LABELS[mat];
+    btn.onclick = () => {
+      selectedMaterial = mat;
+      document.querySelectorAll(".material-btn").forEach(b => b.classList.remove("selected"));
+      btn.classList.add("selected");
+      setActiveField("qty");
+      updateAddBtnState();
+    };
+    materialGrid.appendChild(btn);
+  });
+
+  // ==================== SHARED KEYPAD ====================
+  const keypad = document.getElementById("keypad");
+  const keys = ["1","2","3","4","5","6","7","8","9","C","0","⌫"];
+  keys.forEach(k => {
+    const btn = document.createElement("button");
+    btn.className = "key" + (k === "C" ? " clear" : "");
     btn.textContent = k;
-    btn.onclick = () => handleDigit(k);
+    btn.onclick = () => handleKey(k);
     keypad.appendChild(btn);
   });
 
-  const addKeyBtn = document.createElement("button");
-  addKeyBtn.className = "key add-key";
-  addKeyBtn.id = "addBtn";
-  addKeyBtn.textContent = "✓";
-  addKeyBtn.disabled = true;
-  keypad.appendChild(addKeyBtn);
+  function handleKey(k) {
+    const isMarka = activeField === "marka";
+    let val = isMarka ? markaStr : qtyStr;
 
-  const zeroBtn = document.createElement("button");
-  zeroBtn.className = "key";
-  zeroBtn.textContent = "0";
-  zeroBtn.onclick = () => handleDigit("0");
-  keypad.appendChild(zeroBtn);
+    if (k === "C") {
+      val = "";
+    } else if (k === "⌫") {
+      val = val.slice(0, -1);
+    } else {
+      const maxLen = isMarka ? 2 : 4;
+      if (val.length < maxLen) val += k;
+    }
 
-  const backBtn = document.createElement("button");
-  backBtn.className = "key";
-  backBtn.textContent = "⌫";
-  backBtn.onclick = () => {
-    if (selectedRow === null) { showToast("Сначала выберите ячейку в таблице"); return; }
-    valStr = valStr.slice(0, -1);
-    renderVal();
-    updateBtnState();
-  };
-  keypad.appendChild(backBtn);
-
-  function handleDigit(k) {
-    if (selectedRow === null) { showToast("Сначала выберите ячейку в таблице"); return; }
-    if (valStr.length < 6) valStr += k;
-    renderVal();
-    updateBtnState();
+    if (isMarka) markaStr = val; else qtyStr = val;
+    renderFields();
+    updateAddBtnState();
   }
 
-  function updateBtnState() {
-    const cellChosen = selectedRow !== null && selectedCol !== null;
-    document.getElementById("addBtn").disabled = !(cellChosen && valStr !== "");
-    document.getElementById("deleteBtn").disabled = !cellChosen;
+  function markaValid() {
+    const n = Number(markaStr);
+    return markaStr !== "" && n >= MARKS_MIN && n <= MARKS_MAX;
   }
 
-  // ==================== ADD (replace value) ====================
+  function updateAddBtnState() {
+    const ready = markaValid() && selectedMaterial !== null && qtyStr !== "" && Number(qtyStr) > 0;
+    document.getElementById("addBtn").disabled = !ready;
+    document.getElementById("removeBlockBtn").disabled = !ready;
+  }
+
+  // ==================== ADD ENTRY ====================
   document.getElementById("addBtn").onclick = () => {
-    if (selectedRow === null || valStr === "") return;
-    const t = currentTable();
-    const r = selectedRow, c = selectedCol, v = valStr;
-    showToast(`${t.label} · ${r}, ${c}: ${v}`);
-    if (!dataByTable[t.id][r]) dataByTable[t.id][r] = {};
-    dataByTable[t.id][r][c] = Number(v);
-    valStr = "";
-    renderVal();
-    renderGrid();
-    updateBtnState();
+    if (!markaValid()) {
+      showToast("Марка должна быть от 7 до 40");
+      return;
+    }
+    const markaVal = markaStr, qtyVal = qtyStr, materialVal = selectedMaterial;
+    showToast(`Марка ${markaVal}, ${MATERIAL_LABELS[materialVal]}: +${qtyVal}`);
+    resetForm();
     fetch(API_URL, {
       method: "POST",
       headers: { "Content-Type": "text/plain;charset=utf-8" },
-      body: JSON.stringify({ action: "setCell", table: t.id, row: r, col: c, value: v })
+      body: JSON.stringify({ action: "add", marka: Number(markaVal), material: materialVal, qty: Number(qtyVal) })
     }).then(res => res.json()).then(data => {
       if (!data.success) showToast("Не сохранилось на сервере — попробуйте снова");
-    }).catch(() => showToast("Ошибка сети — не сохранено"));
-  };
-
-  // ==================== DELETE (clear cell) ====================
-  document.getElementById("deleteBtn").onclick = () => {
-    if (selectedRow === null) return;
-    const t = currentTable();
-    const r = selectedRow, c = selectedCol;
-    showToast(`Очищено: ${t.label} · ${r}, ${c}`);
-    dataByTable[t.id][r][c] = "";
-    valStr = "";
-    renderVal();
-    renderGrid();
-    updateBtnState();
-    fetch(API_URL, {
-      method: "POST",
-      headers: { "Content-Type": "text/plain;charset=utf-8" },
-      body: JSON.stringify({ action: "deleteCell", table: t.id, row: r, col: c })
-    }).then(res => res.json()).then(data => {
-      if (!data.success) showToast("Не удалось очистить на сервере");
-    }).catch(() => showToast("Ошибка сети"));
-  };
-
-  // ==================== CLEAR ALL (current table, with confirmation) ====================
-  document.getElementById("clearAllBtn").onclick = () => {
-    const t = currentTable();
-    const ok = confirm(`Точно очистить всю таблицу «${t.label}»? Это действие нельзя отменить.`);
-    if (!ok) return;
-    ROWS.forEach(r => { COLS.forEach(c => { if (!dataByTable[t.id][r]) dataByTable[t.id][r] = {}; dataByTable[t.id][r][c] = ""; }); });
-    selectedRow = null; selectedCol = null; valStr = "";
-    renderVal();
-    renderGrid();
-    updateBtnState();
-    fetch(API_URL, {
-      method: "POST",
-      headers: { "Content-Type": "text/plain;charset=utf-8" },
-      body: JSON.stringify({ action: "clearAll", table: t.id })
-    }).then(res => res.json()).then(data => {
-      if (data.success) showToast(`Таблица «${t.label}» очищена`);
-      else showToast("Не удалось очистить на сервере");
-    }).catch(() => showToast("Ошибка сети"));
-  };
-
-  // ==================== REPORT SCREEN ====================
-  function renderReport() {
-    const wrap = document.getElementById("reportWrap");
-    let html = "";
-    TABLES.forEach(t => {
-      const values = dataByTable[t.id] || {};
-      html += `<div class="report-block"><div class="report-block-label">${t.label}</div>`;
-      html += '<table class="report-table"><thead><tr><th></th>';
-      COLS.forEach(c => html += `<th>${c}</th>`);
-      html += '</tr></thead><tbody>';
-      ROWS.forEach(r => {
-        html += `<tr><th>${r.replace("ппс ", "")}</th>`;
-        COLS.forEach(c => {
-          const v = (values[r] || {})[c];
-          html += `<td>${v === "" || v === undefined ? "" : v}</td>`;
-        });
-        html += '</tr>';
-      });
-      html += '</tbody></table></div>';
+      else loadTableData();
+    }).catch(() => {
+      showToast("Ошибка сети — запись не сохранена");
     });
-    wrap.innerHTML = html;
+  };
+
+  // ==================== REMOVE BLOCK ====================
+  // Same fields as Добавить, but subtracts the entered quantity from the table instead of adding it.
+  document.getElementById("removeBlockBtn").onclick = () => {
+    if (!markaValid()) {
+      showToast("Марка должна быть от 7 до 40");
+      return;
+    }
+    const markaVal = markaStr, qtyVal = qtyStr, materialVal = selectedMaterial;
+    showToast(`Марка ${markaVal}, ${MATERIAL_LABELS[materialVal]}: −${qtyVal}`);
+    resetForm();
+    fetch(API_URL, {
+      method: "POST",
+      headers: { "Content-Type": "text/plain;charset=utf-8" },
+      body: JSON.stringify({ action: "add", marka: Number(markaVal), material: materialVal, qty: -Number(qtyVal) })
+    }).then(res => res.json()).then(data => {
+      if (!data.success) showToast("Не удалось удалить блок — попробуйте снова");
+      else loadTableData();
+    }).catch(() => {
+      showToast("Ошибка сети — блок не удалён");
+    });
+  };
+
+  function resetForm() {
+    markaStr = "";
+    qtyStr = "";
+    selectedMaterial = null;
+    document.querySelectorAll(".material-btn").forEach(b => b.classList.remove("selected"));
+    renderFields();
+    setActiveField("marka");
+    updateAddBtnState();
   }
 
   function showToast(msg) {
@@ -513,25 +551,49 @@
     setTimeout(() => t.classList.remove("show"), 1800);
   }
 
-  // ==================== NAVIGATION: vertical swipe = switch table, horizontal swipe = Добавить <-> Отчёт ====================
-  function showAddScreen() {
-    currentView = "add";
-    document.getElementById("screenAdd").classList.add("active");
-    document.getElementById("screenReport").classList.remove("active");
-    selectedRow = null; selectedCol = null; valStr = "";
-    renderVal();
-    renderGrid();
-    updateBtnState();
-  }
-  function showReportScreen() {
-    currentView = "report";
-    document.getElementById("tableLabel").textContent = "Отчёт";
-    document.getElementById("screenReport").classList.add("active");
-    document.getElementById("screenAdd").classList.remove("active");
-    renderReport();
+  // ==================== TABLE SCREEN ====================
+  async function loadTableData() {
+    const wrap = document.getElementById("tableWrap");
+    try {
+      const res = await fetch(`${API_URL}?action=getData`);
+      const data = await res.json();
+      lastData = data;
+      renderTable(data);
+    } catch (err) {
+      if (!lastData) wrap.innerHTML = '<div class="table-status">Не удалось загрузить данные</div>';
+    }
   }
 
+  function renderTable(data) {
+    document.getElementById("blocksInShopVal").textContent = data.blocksInShop ?? 0;
+    document.getElementById("freeSlotsVal").textContent = data.freeSlots ?? 198;
+
+    const wrap = document.getElementById("tableWrap");
+    let html = '<table class="data-table"><thead><tr>';
+    html += '<th>Марка</th>';
+    MATERIALS.forEach(mat => html += `<th>${MATERIAL_LABELS[mat]}</th>`);
+    html += '<th>Объём</th></tr></thead><tbody>';
+
+    data.rows.forEach(row => {
+      html += '<tr>';
+      html += `<td class="marka-col">${row.marka}</td>`;
+      MATERIALS.forEach(mat => {
+        const v = row.materials[mat] || 0;
+        html += `<td class="${v === 0 ? 'zero' : ''}">${v === 0 ? '' : v}</td>`;
+      });
+      html += `<td class="volume-col">${row.volume === 0 ? '' : Math.round(row.volume * 10) / 10}</td>`;
+      html += '</tr>';
+    });
+
+    html += '</tbody></table>';
+    wrap.innerHTML = html;
+  }
+
+
+  // ==================== SWIPE NAVIGATION ====================
+  const screenOrder = ["screenAdd", "screenTable"];
   let touchStartX = 0, touchStartY = 0;
+
   document.getElementById("app").addEventListener("touchstart", (e) => {
     touchStartX = e.touches[0].clientX;
     touchStartY = e.touches[0].clientY;
@@ -540,33 +602,27 @@
   document.getElementById("app").addEventListener("touchend", (e) => {
     const dx = e.changedTouches[0].clientX - touchStartX;
     const dy = e.changedTouches[0].clientY - touchStartY;
-    if (Math.abs(dx) < 55 && Math.abs(dy) < 55) return;
+    if (Math.abs(dx) < 60 || Math.abs(dx) < Math.abs(dy) * 1.5) return; // require a mostly-horizontal swipe
 
-    if (Math.abs(dx) > Math.abs(dy)) {
-      // horizontal swipe
-      if (dx < 0 && currentView === "add") showReportScreen();       // swipe left: Добавить -> Отчёт
-      else if (dx > 0 && currentView === "report") showAddScreen();  // swipe right: Отчёт -> Добавить
-    } else {
-      // vertical swipe — only cycles tables while on the Добавить screen
-      if (currentView !== "add") return;
-      if (dy < 0 && currentTableIndex < TABLES.length - 1) { currentTableIndex++; showAddScreen(); }
-      else if (dy > 0 && currentTableIndex > 0) { currentTableIndex--; showAddScreen(); }
-    }
+    const current = document.querySelector(".screen.active").id;
+    let idx = screenOrder.indexOf(current);
+    if (dx < 0 && idx < screenOrder.length - 1) idx++;      // swipe left -> next screen
+    else if (dx > 0 && idx > 0) idx--;                       // swipe right -> previous screen
+    else return;
+    switchScreen(screenOrder[idx]);
   }, { passive: true });
 
   // ==================== DISABLE PINCH / DOUBLE-TAP ZOOM ====================
   document.addEventListener("gesturestart", e => e.preventDefault());
   document.addEventListener("gesturechange", e => e.preventDefault());
   document.addEventListener("gestureend", e => e.preventDefault());
+
   let lastTouchEnd = 0;
   document.addEventListener("touchend", e => {
     const now = Date.now();
     if (now - lastTouchEnd <= 300) e.preventDefault();
     lastTouchEnd = now;
   }, { passive: false });
-
-  // ==================== INIT ====================
-  loadAllData();
 
   // ==================== SERVICE WORKER (PWA installability) ====================
   if ("serviceWorker" in navigator) {
