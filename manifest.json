@@ -1,6 +1,6 @@
 {
-  "name": "Альянс Термо — Склад",
-  "short_name": "Блоки",
+  "name": "Альянс Термо — Цех",
+  "short_name": "Цех",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
